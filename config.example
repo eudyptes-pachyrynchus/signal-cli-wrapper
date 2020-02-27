@@ -1,0 +1,9 @@
+# User's number
+MYNUM="+19999999999"
+ 
+# Phone book; make sure every entry from `sg ids` is entered here:
+NUM[joe]="+19999999991"
+NUM[jane]="+19999999992"
+
+# Logfile
+LOG=~/.local/share/signal-cli/data/${MYNUM}.d/msgs

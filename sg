@@ -11,19 +11,21 @@
 # Installation: 1) make this script executable
 #               2) script and signal-cli must be in $PATH
 
-# BEGIN CONFIG:
-
-# User's number
-MYNUM="+19999999999"
-
-# Phone book; make sure every entry from `sg ids` is entered here:
-declare -A NUM
-NUM[joe]="+19999999991"
-NUM[jane]="+19999999992"
-
-# END CONFIG
-
 USAGE="Usage: sg [ ids | snd NAME \"message\" | rcv | cnv NAME | log ]"
+
+declare -A NUM
+
+# Config
+CONFIG=~/.config/signal-cli-wrapper/config
+
+# Exit, if there is no config file
+if [ ! -f $CONFIG ]
+then
+    echo -e "  no config file found."
+    exit 1
+fi
+
+source $CONFIG
 
 # Construct sed substitution for reading log and ids
 SEDSTR="sed -E "
@@ -31,9 +33,6 @@ for i in "${!NUM[@]}" # $(seq 0 $((${#NUM[@]} - 1)))
 do
     SEDSTR="$SEDSTR -e 's/(\\"${NUM[$i]}")/"$i" (\1)/g' "
 done
-
-# Logfile
-LOG=~/.local/share/signal-cli/data/${MYNUM}.d/msgs
 
 # Logfile date format
 DATE=`date +"%s000 (%Y-%m-%dT%H:%M:00.000Z)" -u`

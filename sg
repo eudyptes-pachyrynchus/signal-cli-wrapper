@@ -11,9 +11,10 @@
 # Installation: 1) make this script executable
 #               2) script and signal-cli must be in $PATH
 
-USAGE="Usage: sg [ ids | snd NAME \"message\" | rcv | cnv NAME | log ]"
+USAGE="Usage: sg [ ids | snd NAME \"message\" | gsnd NAME \"message\" | rcv | cnv NAME | gcnv NAME | log ]"
 
 declare -A NUM
+declare -A GRP
 
 # Config
 CONFIG=~/.config/signal-cli-wrapper/config
@@ -73,6 +74,20 @@ then
         exit 1
     fi
 
+# Send a message to the group <name> and write to logfile
+elif [ $1 == "gsnd" ]
+then
+    # as long as the rigth # of arguments
+    if [ $# -eq 3 -a -n "${GRP[$2]}" ]
+    then
+        echo -e "Sent to: "${GRP[$2]}"\nTimestamp: $DATE\nBody: $3\n" >> $LOG
+        signal-cli -u $MYNUM send -g ${GRP[$2]} -m "$3"
+    else
+        echo -e "  " $USAGE
+        exit 1
+    fi
+
+
 # Create a conversation from the logfile
 elif [ $1 == "cnv" ]
 then
@@ -80,6 +95,17 @@ then
     if [ $# -eq 2 -a -n "${NUM[$2]}" ]
     then
 	python conversationextractor.py $LOG ${NUM[$2]} $2
+    else
+        echo -e "  " $USAGE
+        exit 1
+    fi
+# Create a group conversation from the logfile
+elif [ $1 == "gcnv" ]
+then
+    # as long as there is a second argument, the <name>
+    if [ $# -eq 2 -a -n "${GRP[$2]}" ]
+    then
+	python conversationextractor.py $LOG ${GRP[$2]} $2
     else
         echo -e "  " $USAGE
         exit 1

@@ -5,10 +5,12 @@ _A `bash` script for easier use of [signal-cli](https://github.com/AsamK/signal-
 Usage: 
 
  * `sg snd <name> "message"` : Send to a name not a number
+ * `sg gsnd <group-name> "message"` : Send to a group-name not an id
  * `sg rcv` : Get messages, which are written to a log file
  * `sg ids` : Check the phone numbers you have keys for
  * `sg log` : Read the logs more easily (to see receipts and read-receipts)
  * `sg cnv <name>` : Display a conversation:
+ * `sg gcnv <group-name>` : Display a group conversation:
  
 <img src="img/cnv.png" width="50%"/>
 

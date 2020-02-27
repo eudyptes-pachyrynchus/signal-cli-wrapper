@@ -18,6 +18,7 @@ declare -A GRP
 
 # Config
 CONFIG=~/.config/signal-cli-wrapper/config
+TMP=/tmp/signal-cli-wrapper/ids
 
 # Exit, if there is no config file
 if [ ! -f $CONFIG ]
@@ -38,6 +39,10 @@ done
 # Logfile date format
 DATE=`date +"%s000 (%Y-%m-%dT%H:%M:00.000Z)" -u`
 
+listIds () {
+    signal-cli -u $MYNUM listIdentities | eval $SEDSTR | sed 's/:.*$//g'
+}
+
 # Read input
 
 # If no arguments
@@ -49,7 +54,7 @@ then
 # get the registered numbers
 elif [ $1 == "ids" ]
 then
-    signal-cli -u $MYNUM listIdentities | eval $SEDSTR | sed 's/:.*$//g'
+    listIds | tee $TMP
 
 # get the latest messages and write to stdout and to logfile
 elif [ $1 == "rcv" ]
@@ -94,7 +99,12 @@ then
     # as long as there is a second argument, the <name>
     if [ $# -eq 2 -a -n "${NUM[$2]}" ]
     then
-	python conversationextractor.py $LOG ${NUM[$2]} $2
+	if [ ! -f $TMP ]
+	then
+	    mkdir $(dirname $TMP)
+	    listIds > $TMP
+	fi
+	python conversationextractor.py $LOG "-n" ${NUM[$2]} $2 $TMP
     else
         echo -e "  " $USAGE
         exit 1
@@ -105,7 +115,12 @@ then
     # as long as there is a second argument, the <name>
     if [ $# -eq 2 -a -n "${GRP[$2]}" ]
     then
-	python conversationextractor.py $LOG ${GRP[$2]} $2
+	if [ ! -f $TMP ]
+	then
+	    mkdir $(dirname $TMP)
+	    listIds > $TMP
+	fi
+	python conversationextractor.py $LOG "-g" ${GRP[$2]} $2 $TMP
     else
         echo -e "  " $USAGE
         exit 1
